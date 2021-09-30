@@ -1,0 +1,17 @@
+{
+  "name": "test-audio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "parcel-bundler": "^1.12.5",
+    "reset-css": "^5.0.1"
+  },
+  "devDependencies": {
+    "sass": "^1.42.1"
+  },
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html"
+  }
+}
