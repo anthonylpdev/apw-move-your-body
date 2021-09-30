@@ -1,4 +1,4 @@
-# Antho parle web - Creative Contest
+# Antho parle web - Creative Contest - Move your body
 
 ![APW for Three.js](apw.png)
 
