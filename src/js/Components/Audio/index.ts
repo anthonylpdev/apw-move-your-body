@@ -1,0 +1,70 @@
+import MyDat from '../../Utils/MyDat'
+import remap from '../../Utils/remap'
+
+export default class Audio {
+  private audio: HTMLAudioElement
+  private context: AudioContext
+  private source: MediaElementAudioSourceNode
+  private analyser: AnalyserNode
+  private bufferLength: number
+  public dataArray: Uint8Array
+
+  private gui = MyDat.getGUI().addFolder('audio')
+
+  constructor() {
+    this.audio = document.querySelector('audio')
+
+    this.initAudio(this.audio)
+  }
+
+  private initAudio(audioEvent: HTMLAudioElement) {
+    // Avoid Cross origin issue
+    audioEvent.crossOrigin = 'anonymous'
+
+    // Create an audio source node based on an audio HTML element
+    this.context = new AudioContext()
+    this.source = this.context.createMediaElementSource(audioEvent)
+
+    // Create and link an audio analyser
+    this.analyser = this.context.createAnalyser()
+    this.source.connect(this.analyser)
+    this.analyser.connect(this.context.destination)
+
+    // FFT (Fast Fourier Transform) => Representation of the amplitude sound frequencies
+    // "fftSize" Must be a power of 2 between 2^5 and 2^15, defaults to 2048.
+    this.analyser.fftSize = 2048
+    this.analyser.maxDecibels = -20
+
+    // frequencyBinCount : number of data values you will have to play with for the visualization (half of FFT)
+    this.bufferLength = this.analyser.frequencyBinCount
+
+    // Initialization of an array containing all our amplitudes
+    this.dataArray = new Uint8Array(this.bufferLength)
+
+    this.gui.add(this.audio, 'volume', 0, 1)
+  }
+
+  public play() {
+    this.context.resume()
+    this.audio.play()
+  }
+
+  public pause() {
+    this.context.suspend()
+    this.audio.pause()
+  }
+
+  public toggle() {
+    if (this.audio.paused) this.play()
+    else this.pause()
+  }
+
+  public setAtProg(prog: number) {
+    console.log(prog)
+    this.audio.currentTime = remap(prog, [0, 1], [0, this.audio.duration])
+  }
+
+  public update() {
+    this.analyser.getByteFrequencyData(this.dataArray)
+  }
+}

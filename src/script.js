@@ -9,7 +9,6 @@ class Base {
     this.initAudio(this.audio)
     this.initCanvas()
     this.listener()
-
   }
 
   initAudio(audioEvent) {
@@ -49,7 +48,7 @@ class Base {
     this.canvas.height = window.innerHeight
     this.WIDTH = this.canvas.width
     this.HEIGHT = this.canvas.height
-    this.barWidth = (this.WIDTH / this.bufferLength)
+    this.barWidth = this.WIDTH / this.bufferLength
   }
 
   listener() {
@@ -74,11 +73,16 @@ class Base {
     for (let i = 0; i < this.bufferLength; i++) {
       this.barHeight = this.dataArray[i] * 3
 
-      let r = this.barHeight + (25 * (i / this.bufferLength))
+      let r = this.barHeight + 25 * (i / this.bufferLength)
       let g = 250 * (i / this.bufferLength)
       let b = 50
       this.ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')'
-      this.ctx.fillRect(this.x, this.HEIGHT - this.barHeight, this.barWidth, this.barHeight)
+      this.ctx.fillRect(
+        this.x,
+        this.HEIGHT - this.barHeight,
+        this.barWidth,
+        this.barHeight
+      )
       this.x += this.barWidth + 1
     }
     requestAnimationFrame(this.renderFrame.bind(this))

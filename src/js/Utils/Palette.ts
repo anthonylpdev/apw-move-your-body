@@ -1,0 +1,1 @@
+export const SHAPE_COLORS = [0xe25100, 0xc200c6, 0x2e2830, 0x6dbc]
