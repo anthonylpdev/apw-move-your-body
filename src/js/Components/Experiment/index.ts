@@ -5,6 +5,8 @@ import observableState, { ObservableState } from '../../Utils/observableState'
 import Visualizer from '../Visualizer'
 import Audio from '../Audio'
 import remap from '../../Utils/remap'
+import ScreenScene from './ScreenScene'
+import { WebGLMultisampleRenderTarget } from 'three'
 
 export type AppState = ObservableState<{ anim: Anims }>
 
@@ -14,19 +16,28 @@ export default class Experiment {
   private renderer: THREE.WebGLRenderer
 
   private mainScene: MainScene
+  private screenScene: ScreenScene
   private state: AppState = observableState({ anim: 'start' })
 
   private clock: THREE.Clock
   private visualizer: Visualizer
   private audio: Audio
   private popin: HTMLElement
+  private renderTarget: WebGLMultisampleRenderTarget
 
   constructor(renderer: THREE.WebGLRenderer, gltf: GLTF) {
     const startOnAudio = false
     const volume = 0.4
 
+    this.renderTarget = new THREE.WebGLMultisampleRenderTarget(500, 500)
     this.renderer = renderer
-    this.mainScene = new MainScene(renderer, gltf, this.state)
+    this.screenScene = new ScreenScene(gltf)
+    this.mainScene = new MainScene(
+      renderer,
+      gltf,
+      this.renderTarget,
+      this.state
+    )
     this.clock = new THREE.Clock(true)
     this.audio = new Audio(volume)
     this.visualizer = new Visualizer(this.audio.dataArray, startOnAudio)
@@ -54,6 +65,14 @@ export default class Experiment {
     this.audio.update()
     this.visualizer.renderFrame()
     this.mainScene.tick(elapsedTime, deltaTime)
+    this.screenScene.tick(elapsedTime, deltaTime)
+
+    this.renderer.setRenderTarget(this.renderTarget)
+    this.renderer.setSize(this.renderTarget.width, this.renderTarget.height)
+    this.renderer.render(this.screenScene.scene, this.screenScene.camera)
+
+    this.renderer.setRenderTarget(null)
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.render(this.mainScene.scene, this.mainScene.camera)
   }
 }

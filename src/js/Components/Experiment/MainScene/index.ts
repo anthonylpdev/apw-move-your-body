@@ -17,11 +17,16 @@ export default class MainScene {
 
   private tickingObjects: { tick: (time: number, delta: number) => void }[] = []
 
-  constructor(renderer: THREE.WebGLRenderer, gltf: GLTF, state: AppState) {
+  constructor(
+    renderer: THREE.WebGLRenderer,
+    gltf: GLTF,
+    renderTarget: THREE.WebGLRenderTarget,
+    state: AppState
+  ) {
     this.state = state
     this.renderer = renderer
     this.setCamera(gltf)
-    this.setObjects(gltf)
+    this.setObjects(gltf, renderTarget)
   }
 
   private setCamera(gltf: GLTF) {
@@ -49,7 +54,7 @@ export default class MainScene {
     window.addEventListener('resize', resize)
   }
 
-  private setObjects(gltf: GLTF) {
+  private setObjects(gltf: GLTF, renderTarget: THREE.WebGLRenderTarget) {
     this.scene = new THREE.Scene()
 
     const lightGui = MyDat.getGUI().addFolder('Light')
@@ -66,6 +71,15 @@ export default class MainScene {
 
     const backLight = new BackLight(gltf, lightGui)
     const centerLight = new CenterLight(lightGui)
+    const middle = gltf.scene.getObjectByName('Middle') as THREE.Mesh
+    const rightSide = gltf.scene.getObjectByName('Right_Side') as THREE.Mesh
+    const leftSide = gltf.scene.getObjectByName('Left_Side') as THREE.Mesh
+    const material = new THREE.MeshBasicMaterial()
+    material.map = renderTarget.texture
+
+    middle.material = material
+    rightSide.material = material
+    leftSide.material = material
 
     this.scene.add(
       ...untouchedChildren,

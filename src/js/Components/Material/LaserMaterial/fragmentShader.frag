@@ -22,11 +22,11 @@ float cremap(float value, float start1, float stop1, float start2, float stop2) 
 
 void main() {
   float y = quarticOut(vUv.y);
-  float blur = cremap(vUv.y, 0., 1., (1. - uBlur) / 4., 0.);
+  float blur = cremap(vUv.y, 0., 1., 0.01, (1. - uBlur) / 4.);
   float decay = cremap(vUv.y, 0., 1., 1., 1. - uDecay);
 
   float a = abs(vUv.x - 0.5);
-    a = smoothstep(0.25 + blur, 0.25 - blur, a);
+  a = smoothstep(0.25 + blur, 0.25 - blur, a);
   gl_FragColor = vec4(uColor, a * decay);
   // gl_FragColor = vec4(uColor, decay);
   // gl_FragColor = vec4(uColor, vUv.y);
