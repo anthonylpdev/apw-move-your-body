@@ -1,5 +1,6 @@
 precision highp float;
 
+uniform sampler2D uGradient;
 
 varying float vProg;
 varying vec3 vNormal;
@@ -17,5 +18,8 @@ void main() {
     vec2 uv = abs(0.5 - vUv);
     float v = max(step(0.45, uv.x), step(0.45, uv.y));
   // gl_FragColor = vec4(vec3(vUv, 1.), 1.);
-  gl_FragColor = vec4(hsv2rgb(vec3(vProg, 1., 1.) * v), 1.);
+  // gl_FragColor = vec4(hsv2rgb(vec3(vProg, 1., 1.) * v), 1.);
+  vec2 gradientUv =  vec2(fract(vProg * 3.), 0.);
+  gl_FragColor = vec4(texture2D(uGradient, gradientUv).rgb * v, 1.);
+  // gl_FragColor = vec4(vec3(step(vProg, 0.1)), 1.);
 }

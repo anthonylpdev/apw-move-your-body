@@ -14,6 +14,14 @@ export default class AbstractSquares {
 
     this.gui = MyDat.getGUI().addFolder('Squares')
 
+    const t = new THREE.TextureLoader().load(
+      require('@textures/gradient3.png').default,
+      (t) => {
+        t.minFilter = THREE.NearestFilter
+        t.magFilter = THREE.NearestFilter
+      }
+    )
+
     this.material = new THREE.RawShaderMaterial({
       fragmentShader,
       vertexShader,
@@ -22,6 +30,9 @@ export default class AbstractSquares {
         uMinDistance: { value: -1.7 },
         uSquareAmounts: { value: amount },
         uTime: { value: 0 },
+        uGradient: {
+          value: t,
+        },
       },
     })
 
@@ -36,6 +47,8 @@ export default class AbstractSquares {
 
     for (let index = 0; index < amount; index++)
       this.mesh.setMatrixAt(index, new THREE.Matrix4())
+
+    console.log(this.mesh)
   }
 
   private createGeometry(amount: number, origGeometry: THREE.BufferGeometry) {

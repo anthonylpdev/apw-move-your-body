@@ -29,5 +29,5 @@ void main() {
   a = smoothstep(0.25 + blur, 0.25 - blur, a);
   gl_FragColor = vec4(uColor, a * decay);
   // gl_FragColor = vec4(uColor, decay);
-  // gl_FragColor = vec4(uColor, vUv.y);
+  // gl_FragColor = vec4(vec3(vUv, 0.),1.);
 }
