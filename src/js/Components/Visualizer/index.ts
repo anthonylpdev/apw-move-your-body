@@ -10,45 +10,32 @@ export default class Analyzer {
   private barHeight: number
   private x: number
   private zoom = { max: 0, min: 0 }
+  private _isVisible = false
+
+  public get isVisible(): boolean {
+    return this._isVisible
+  }
+  public set isVisible(value: boolean) {
+    this._isVisible = value
+    this.canvas.classList.toggle('hide', !value)
+    this.canvasSize()
+  }
 
   private gui = MyDat.getGUI().addFolder('visualizer')
 
-  constructor(buffer: Uint8Array) {
+  constructor(buffer: Uint8Array, startVisible: boolean) {
     this.dataArray = buffer
     this.canvas = document.querySelector('#visualizer-canvas')
     this.zoom = { max: this.dataArray.length - 1, min: 0 }
+    this.isVisible = startVisible
 
     this.initCanvas()
     this.listener()
+    this.initGui()
   }
 
-  initCanvas() {
-    this.ctx = this.canvas.getContext('2d')
-    this.canvasSize()
-    this.barHeight = 10
-    this.x = 0
-    this.renderFrame()
-  }
-
-  canvasSize() {
-    this.canvas.width = this.canvas.clientWidth
-    this.canvas.height = this.canvas.clientHeight
-    this.WIDTH = this.canvas.width
-    this.HEIGHT = this.canvas.height
-  }
-
-  listener() {
-    window.addEventListener('resize', () => {
-      this.canvasSize()
-    })
-  }
-
-  initGui() {
-    this.gui.add(this.zoom, 'min', 0, this.dataArray.length, 1)
-    this.gui.add(this.zoom, 'max', 0, this.dataArray.length, 1)
-  }
-
-  renderFrame() {
+  public renderFrame() {
+    if (!this.isVisible) return
     this.x = 0
     this.ctx.fillStyle = '#000'
     this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT)
@@ -70,5 +57,37 @@ export default class Analyzer {
       )
       this.x += this.barWidth + 1
     }
+  }
+
+  public show() {
+    this.canvas.style.display = 'none'
+  }
+
+  private initCanvas() {
+    this.ctx = this.canvas.getContext('2d')
+    this.canvasSize()
+    this.barHeight = 10
+    this.x = 0
+    this.renderFrame()
+  }
+
+  private canvasSize() {
+    this.canvas.width = this.canvas.clientWidth
+    this.canvas.height = this.canvas.clientHeight
+    this.WIDTH = this.canvas.width
+    this.HEIGHT = this.canvas.height
+  }
+
+  private listener() {
+    window.addEventListener('resize', () => {
+      this.canvasSize()
+    })
+  }
+
+  private initGui() {
+    this.gui.open()
+    this.gui.add(this, 'isVisible').name('show')
+    this.gui.add(this.zoom, 'min', 0, this.dataArray.length, 1)
+    this.gui.add(this.zoom, 'max', 0, this.dataArray.length, 1)
   }
 }

@@ -25,7 +25,7 @@ function initWebglRenderer(): THREE.WebGLRenderer {
 
 export default function Load() {
   return new GLTFLoader()
-    .loadAsync(require('@models/chess.glb').default)
+    .loadAsync(require('@models/scene.glb').default)
     .then(Setup)
 }
 

@@ -22,19 +22,23 @@ export default class Experiment {
   private popin: HTMLElement
 
   constructor(renderer: THREE.WebGLRenderer, gltf: GLTF) {
+    const startOnAudio = false
+    const volume = 0.4
+
     this.renderer = renderer
     this.mainScene = new MainScene(renderer, gltf, this.state)
     this.clock = new THREE.Clock(true)
-    this.audio = new Audio()
-    this.visualizer = new Visualizer(this.audio.dataArray)
+    this.audio = new Audio(volume)
+    this.visualizer = new Visualizer(this.audio.dataArray, startOnAudio)
+    if (startOnAudio) this.audio.play()
     this.popin = document.querySelector('#intro')
 
     document.querySelector('#click-me').addEventListener('click', (event) => {
       event.preventDefault()
       this.popin.classList.add('hide')
-      setTimeout(() => {
-        this.audio.play()
-      }, 1000)
+      // setTimeout(() => {
+      //   this.audio.play()
+      // }, 1000)
     })
 
     document.addEventListener('keypress', (e) => {

@@ -11,13 +11,13 @@ export default class Audio {
 
   private gui = MyDat.getGUI().addFolder('audio')
 
-  constructor() {
+  constructor(volume: number = 0.05) {
     this.audio = document.querySelector('audio')
-
-    this.initAudio(this.audio)
+    this.gui.open()
+    this.initAudio(this.audio, volume)
   }
 
-  private initAudio(audioEvent: HTMLAudioElement) {
+  private initAudio(audioEvent: HTMLAudioElement, volume: number) {
     // Avoid Cross origin issue
     audioEvent.crossOrigin = 'anonymous'
 
@@ -41,6 +41,7 @@ export default class Audio {
     // Initialization of an array containing all our amplitudes
     this.dataArray = new Uint8Array(this.bufferLength)
 
+    this.audio.volume = volume
     this.gui.add(this.audio, 'volume', 0, 1)
   }
 
@@ -60,7 +61,6 @@ export default class Audio {
   }
 
   public setAtProg(prog: number) {
-    console.log(prog)
     this.audio.currentTime = remap(prog, [0, 1], [0, this.audio.duration])
   }
 
