@@ -6,7 +6,11 @@ import Visualizer from '../Visualizer'
 import Audio from '../Audio'
 import remap from '../../Utils/remap'
 import ScreenScene from './ScreenScene'
-import { WebGLMultisampleRenderTarget } from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
+import MyDat from '../../Utils/MyDat'
+import Analyser from '../Analyser'
 
 export type AppState = ObservableState<{ anim: Anims }>
 
@@ -23,24 +27,51 @@ export default class Experiment {
   private visualizer: Visualizer
   private audio: Audio
   private popin: HTMLElement
-  private renderTarget: WebGLMultisampleRenderTarget
+  private renderTarget: THREE.WebGLMultisampleRenderTarget
+  private composer: EffectComposer
+  private analyser: Analyser
 
   constructor(renderer: THREE.WebGLRenderer, gltf: GLTF) {
     const startOnAudio = false
     const volume = 0.4
 
-    this.renderTarget = new THREE.WebGLMultisampleRenderTarget(500, 500)
+    this.clock = new THREE.Clock(true)
+    this.audio = new Audio(volume)
+    this.analyser = new Analyser(this.audio.dataArray)
+    this.visualizer = new Visualizer(
+      this.audio.dataArray,
+      startOnAudio,
+      this.analyser.state
+    )
+
+    this.composer = new EffectComposer(renderer)
+    this.renderTarget = new THREE.WebGLMultisampleRenderTarget(256, 256)
     this.renderer = renderer
     this.screenScene = new ScreenScene(gltf)
     this.mainScene = new MainScene(
       renderer,
       gltf,
       this.renderTarget,
-      this.state
+      this.analyser.state
     )
-    this.clock = new THREE.Clock(true)
-    this.audio = new Audio(volume)
-    this.visualizer = new Visualizer(this.audio.dataArray, startOnAudio)
+
+    const renderPass = new RenderPass(
+      this.mainScene.scene,
+      this.mainScene.camera
+    )
+    this.composer.addPass(renderPass)
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.2,
+      0,
+      0
+    )
+    const bloomPassGui = MyDat.getGUI().addFolder('Bloom')
+    bloomPassGui.add(bloomPass, 'radius', 0, 1, 0.01)
+    bloomPassGui.add(bloomPass, 'threshold', 0, 1, 0.01)
+    bloomPassGui.add(bloomPass, 'strength', 0, 3, 0.01)
+    this.composer.addPass(bloomPass)
+
     if (startOnAudio) this.audio.play()
     this.popin = document.querySelector('#intro')
 
@@ -56,6 +87,9 @@ export default class Experiment {
       if (e.key === ' ') this.audio.toggle()
       if (/^\d$/.test(e.key))
         this.audio.setAtProg(remap(Number(e.key), [0, 10], [0, 1]))
+      if (e.key === '+') this.audio.forward()
+      if (e.key === '-') this.audio.back()
+      // if (e.key === 'l') console.log(this.analyser.state)
     })
   }
 
@@ -64,6 +98,7 @@ export default class Experiment {
     const elapsedTime = this.clock.elapsedTime
     this.audio.update()
     this.visualizer.renderFrame()
+    this.analyser.analyse()
     this.mainScene.tick(elapsedTime, deltaTime)
     this.screenScene.tick(elapsedTime, deltaTime)
 
@@ -73,6 +108,6 @@ export default class Experiment {
 
     this.renderer.setRenderTarget(null)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
-    this.renderer.render(this.mainScene.scene, this.mainScene.camera)
+    this.composer.render()
   }
 }

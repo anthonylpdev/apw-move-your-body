@@ -15,12 +15,20 @@ export default class BackLasers {
     this.gui = MyDat.getGUI().addFolder('BackLasers')
 
     const laserMaterial = new LaserMaterial(
-      { blur: 0, decay: 0.2, color: 0xffffff },
+      { blur: 0, decay: 0.2, color: 0xf72ae8 },
       this.gui
     )
+    const lights: THREE.SpotLight[] = []
+    for (const mesh of this.meshes) {
+      mesh.material = laserMaterial.material
+      const l = new THREE.SpotLight(0xf72ae8, 20, 20, 0.03, 0.5)
+      l.position.copy(mesh.position)
+      l.position.y += 0.5
+      l.target = mesh
+      lights.push(l)
+    }
+    console.log(lights)
 
-    for (const mesh of this.meshes) mesh.material = laserMaterial.material
-
-    this.group.add(...this.meshes)
+    this.group.add(...this.meshes, ...lights)
   }
 }

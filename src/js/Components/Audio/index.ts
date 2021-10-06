@@ -13,7 +13,6 @@ export default class Audio {
 
   constructor(volume: number = 0.05) {
     this.audio = document.querySelector('audio')
-    this.gui.open()
     this.initAudio(this.audio, volume)
   }
 
@@ -62,6 +61,17 @@ export default class Audio {
 
   public setAtProg(prog: number) {
     this.audio.currentTime = remap(prog, [0, 1], [0, this.audio.duration])
+  }
+
+  public back() {
+    this.audio.currentTime = Math.max(this.audio.currentTime - 2, 0)
+  }
+
+  public forward() {
+    this.audio.currentTime = Math.min(
+      this.audio.currentTime + 2,
+      this.audio.duration
+    )
   }
 
   public update() {

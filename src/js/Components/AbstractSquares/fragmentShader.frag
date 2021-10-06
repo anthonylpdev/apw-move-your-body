@@ -1,10 +1,13 @@
 precision highp float;
 
 uniform sampler2D uGradient;
+uniform float uFogDensity;
+uniform vec3 uFogColor;
 
 varying float vProg;
-varying vec3 vNormal;
 varying vec2 vUv;
+varying float vFogDepth;
+
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -20,6 +23,9 @@ void main() {
   // gl_FragColor = vec4(vec3(vUv, 1.), 1.);
   // gl_FragColor = vec4(hsv2rgb(vec3(vProg, 1., 1.) * v), 1.);
   vec2 gradientUv =  vec2(fract(vProg * 3.), 0.);
+
   gl_FragColor = vec4(texture2D(uGradient, gradientUv).rgb * v, 1.);
+  float fogFactor = 1.0 - exp( - uFogDensity * uFogDensity * vFogDepth * vFogDepth );
+  gl_FragColor.rgb = mix( gl_FragColor.rgb, uFogColor, fogFactor );
   // gl_FragColor = vec4(vec3(step(vProg, 0.1)), 1.);
 }

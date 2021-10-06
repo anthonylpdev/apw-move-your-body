@@ -29,6 +29,8 @@ export default class AbstractSquares {
         uMaxDistance: { value: 90 },
         uMinDistance: { value: -1.7 },
         uSquareAmounts: { value: amount },
+        uFogDensity: { value: 0.1 },
+        uFogColor: { value: new THREE.Color(0x000000) },
         uTime: { value: 0 },
         uGradient: {
           value: t,

@@ -12,9 +12,9 @@ uniform float uMinDistance;
 uniform float uSquareAmounts;
 uniform float uTime;
 
-varying vec3 vNormal;
 varying vec2 vUv;
 varying float vProg;
+varying float vFogDepth;
 
 #define PI 3.14159265359
 
@@ -40,9 +40,10 @@ void main() {
 
   mat4 rotation = rotationMatrix(vec3(0., 0., -1.), progress * PI * 10.);
   transformed *= rotation;
-  
-  gl_Position = projectionMatrix * modelViewMatrix * transformed;
-  vNormal = normal;
+  vec4 mvPosition = modelViewMatrix * transformed;
+  gl_Position = projectionMatrix * mvPosition;
+
+  vFogDepth = - mvPosition.z;
   vUv = uv;
   vProg = progress;
 }

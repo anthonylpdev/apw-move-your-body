@@ -5,7 +5,7 @@ import MyDat from '../../Utils/MyDat'
 export default class CenterLight {
   private params = {
     color: 0xe5ffff,
-    intensity: 1.13,
+    intensity: 0.2,
     distance: 20,
     decay: 2,
   }

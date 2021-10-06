@@ -7,13 +7,15 @@ import FrontLasers from '../../FrontLasers'
 import BackLight from '../../BackLight'
 import CenterLight from '../../CenterLight'
 import BackLasers from '../../BackLasers'
+import Analyser from '../../Analyser'
+import BackPanel from '../../BackPanel'
 
 export default class MainScene {
   public scene: THREE.Scene
   public camera: THREE.PerspectiveCamera
 
   private renderer: THREE.WebGLRenderer
-  private state: AppState
+  private state: Analyser['state']
 
   private tickingObjects: { tick: (time: number, delta: number) => void }[] = []
 
@@ -21,7 +23,7 @@ export default class MainScene {
     renderer: THREE.WebGLRenderer,
     gltf: GLTF,
     renderTarget: THREE.WebGLRenderTarget,
-    state: AppState
+    state: Analyser['state']
   ) {
     this.state = state
     this.renderer = renderer
@@ -56,20 +58,26 @@ export default class MainScene {
 
   private setObjects(gltf: GLTF, renderTarget: THREE.WebGLRenderTarget) {
     this.scene = new THREE.Scene()
+    this.scene.background = new THREE.Color(0x000000)
 
     const lightGui = MyDat.getGUI().addFolder('Light')
 
     const gltfChildren = gltf.scene.children
     let untouchedChildren = gltfChildren.filter(
-      (o) => !o.name.startsWith('Light') || o.name !== 'Middle_Back_light_Null'
+      (o) =>
+        !o.name.startsWith('Light') &&
+        !o.name.startsWith('Shape') &&
+        o.name !== 'Middle_Back_light_Null' &&
+        !/(Back_light)$/.test(o.name)
     )
 
+    console.log(untouchedChildren)
     const frontLasers = gltfChildren.filter((o) => o.name.startsWith('Light_2'))
     const frontLasersObj = new FrontLasers(frontLasers as THREE.Mesh[])
     const backLasers = gltfChildren.filter((o) => o.name.startsWith('Light_1'))
     const backLasersObj = new BackLasers(backLasers as THREE.Mesh[])
 
-    const backLight = new BackLight(gltf, lightGui)
+    const backLight = new BackLight(gltf, this.state, lightGui)
     const centerLight = new CenterLight(lightGui)
     const middle = gltf.scene.getObjectByName('Middle') as THREE.Mesh
     const rightSide = gltf.scene.getObjectByName('Right_Side') as THREE.Mesh
@@ -81,12 +89,20 @@ export default class MainScene {
     rightSide.material = material
     leftSide.material = material
 
+    const backPanels = gltfChildren.filter((o) =>
+      /(Back_light)$/.test(o.name)
+    ) as THREE.Mesh[]
+    const backPanel = new BackPanel(backPanels, this.state)
+
+    this.tickingObjects.push(backLight, backPanel)
+
     this.scene.add(
       ...untouchedChildren,
       centerLight.light,
       frontLasersObj.group,
       backLasersObj.group,
-      backLight.group
+      backLight.group,
+      backPanel.group
       // new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial())
     )
     this.scene.add(this.camera)

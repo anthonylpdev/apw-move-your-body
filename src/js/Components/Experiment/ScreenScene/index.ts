@@ -19,7 +19,7 @@ export default class ScreenScene {
 
   private setObjects(gltf: GLTF) {
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color('red')
+    this.scene.background = new THREE.Color('black')
 
     const squares = new AbstractSquares(
       200,

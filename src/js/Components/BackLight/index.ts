@@ -1,10 +1,12 @@
 import * as THREE from 'three'
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
+import cremap from '../../Utils/cremap'
 import MyDat from '../../Utils/MyDat'
+import Analyser from '../Analyser'
 
 export default class BackLight {
   private params = {
-    color: 0xc3f0ff,
+    color: 0xe56f00,
     intensity: 2,
     distance: 28,
     angle: 1.09,
@@ -14,11 +16,18 @@ export default class BackLight {
 
   private gui: dat.GUI
 
+  private state: Analyser['state']
+
   private light: THREE.SpotLight
   public group: THREE.Group
 
-  constructor(gltf: GLTF, parentGui = MyDat.getGUI()) {
+  constructor(
+    gltf: GLTF,
+    state: Analyser['state'],
+    parentGui = MyDat.getGUI()
+  ) {
     this.gui = parentGui.addFolder('Back light')
+    this.state = state
     this.setupObject(gltf)
     this.setupGui()
   }
@@ -64,5 +73,9 @@ export default class BackLight {
     this.gui
       .add(this.params, 'decay', 0, 3)
       .onChange((v) => (this.light.decay = v))
+  }
+
+  public tick(time: number, delta: number) {
+    this.light.intensity = cremap(this.state.freqOccupency, [0.15, 1], [0, 2])
   }
 }

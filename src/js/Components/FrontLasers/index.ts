@@ -15,7 +15,7 @@ export default class FrontLasers {
     this.gui = MyDat.getGUI().addFolder('FrontLasers')
 
     const laserMaterial = new LaserMaterial(
-      { blur: 0, decay: 0.2, color: 0xff56 },
+      { blur: 0, decay: 0.2, color: 0xff4c00 },
       this.gui
     )
 
