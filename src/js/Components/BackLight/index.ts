@@ -79,7 +79,7 @@ export default class BackLight {
     this.light.intensity = cremap(
       Easing.Quartic.In(this.state.freqOccupency),
       [0.15, 1],
-      [0, 3]
+      [0, 4]
     )
   }
 }

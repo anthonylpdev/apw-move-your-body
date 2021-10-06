@@ -37,10 +37,7 @@ export default class BackLaser {
   private laserState: ObservableState<LaserMaterialParams>
   private enable: boolean = false
 
-  private static nbr = 0
-
   constructor(mesh: THREE.Mesh, state: Analyser['state']) {
-    BackLaser.nbr++
     this.state = state
     this.mesh = mesh
     this.laserState = observableState({
@@ -98,6 +95,8 @@ export default class BackLaser {
     //   rgb.b
     // )
 
-    if (this.state.freqOccupency > 0.7) this.enable = true
+    // if (this.state.freqOccupency > 0.7) this.enable = true
+    console.log(this.state.bass.speed)
+    if (this.state.bass.speed > 0.5) this.enable = !this.enable
   }
 }

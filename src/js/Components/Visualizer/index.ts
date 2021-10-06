@@ -70,7 +70,7 @@ export default class Visualizer {
   private debugSound(sound: number, x: number, y: number, fill: string) {
     this.ctx.fillStyle = fill
     this.ctx.beginPath()
-    this.ctx.arc(x, y, Math.max(sound, 0) * 50 + 5, 0, Math.PI * 2)
+    this.ctx.arc(x, y, Math.max(sound, 0) * 45 + 5, 0, Math.PI * 2)
     this.ctx.closePath()
     this.ctx.fill()
     this.ctx.strokeStyle = fill
@@ -102,6 +102,8 @@ export default class Visualizer {
     this.debugSound(s.melody8.normVal, 800, 100, 'cyan')
     this.debugSound(s.freqOccupency, 100, 200, 'white')
     this.debugSound(s.averageVolume / 100, 200, 200, 'grey')
+    this.debugSound(s.bass.current / s.bass.max, 300, 200, 'red')
+    this.debugSound(s.bass.speed, 400, 200, 'red')
 
     for (let i = this.zoom.min; i <= this.zoom.max; i++) {
       this.barHeight = this.dataArray[i] * 3

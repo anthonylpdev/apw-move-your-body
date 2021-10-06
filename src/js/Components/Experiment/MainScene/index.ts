@@ -73,7 +73,10 @@ export default class MainScene {
 
     console.log(untouchedChildren)
     const frontLasers = gltfChildren.filter((o) => o.name.startsWith('Light_2'))
-    const frontLasersObj = new FrontLasers(frontLasers as THREE.Mesh[])
+    const frontLasersObj = new FrontLasers(
+      frontLasers as THREE.Mesh[],
+      this.state
+    )
     const backLasers = gltfChildren.filter((o) => o.name.startsWith('Light_1'))
     const backLasersObj = new BackLasers(backLasers as THREE.Mesh[], this.state)
 
@@ -119,7 +122,12 @@ export default class MainScene {
     ) as THREE.Mesh[]
     const backPanel = new BackPanel(backPanels, this.state)
 
-    this.tickingObjects.push(backLight, backPanel, backLasersObj)
+    this.tickingObjects.push(
+      backLight,
+      backPanel,
+      backLasersObj,
+      frontLasersObj
+    )
 
     this.scene.add(
       ...untouchedChildren,

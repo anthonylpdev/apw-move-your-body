@@ -55,6 +55,9 @@ export class Note {
   }
 }
 
+let bassMax = 0
+let bassSpeedMax = 0
+
 export default class Analyser {
   private dataArray: Uint8Array
   public state: {
@@ -69,6 +72,13 @@ export default class Analyser {
     melody8: Note
     harmonicComparison: number
     freqOccupency: number
+    bass: {
+      previous: number
+      current: number
+      speed: number
+      max: number
+      maxSpeed: number
+    }
   }
 
   constructor(dataArray: Uint8Array) {
@@ -117,6 +127,13 @@ export default class Analyser {
       }),
       freqOccupency: 0,
       harmonicComparison: 0,
+      bass: {
+        previous: 0,
+        current: 0,
+        speed: 0,
+        maxSpeed: 34,
+        max: 84,
+      },
     }
   }
 
@@ -163,5 +180,16 @@ export default class Analyser {
 
   public analyse() {
     this.analyseNotes()
+
+    this.state.bass.previous = this.state.bass.current
+    this.state.bass.current =
+      Math.max(this.dataArray[3] - 200, 0) +
+      Math.max(this.dataArray[2] - 180, 0)
+    this.state.bass.speed =
+      Math.max(this.state.bass.current - this.state.bass.previous, 0) /
+      this.state.bass.maxSpeed
+
+    bassMax = Math.max(this.state.bass.current, bassMax)
+    bassSpeedMax = Math.max(this.state.bass.speed, bassSpeedMax)
   }
 }
