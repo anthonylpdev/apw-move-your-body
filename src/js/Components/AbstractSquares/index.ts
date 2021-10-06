@@ -26,7 +26,7 @@ export default class AbstractSquares {
       fragmentShader,
       vertexShader,
       uniforms: {
-        uMaxDistance: { value: 90 },
+        uMaxDistance: { value: 45 },
         uMinDistance: { value: -1.7 },
         uSquareAmounts: { value: amount },
         uFogDensity: { value: 0.1 },

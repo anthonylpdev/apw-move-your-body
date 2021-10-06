@@ -13,14 +13,19 @@ export default class FrontLasers {
     this.meshes = meshes
     this.group = new THREE.Group()
     this.gui = MyDat.getGUI().addFolder('FrontLasers')
+    console.log(meshes)
 
     const laserMaterial = new LaserMaterial(
-      { blur: 0, decay: 0.2, color: 0xff4c00 },
+      { blur: 0, decay: 0.2, color: 0xff4c00, intensity: 1 },
       this.gui
     )
 
     for (const mesh of this.meshes) mesh.material = laserMaterial.material
 
     this.group.add(...this.meshes)
+  }
+
+  public tick(time: number, delta: number) {
+    // for (const obj of this.tickingObjects) obj.tick(time, delta)
   }
 }

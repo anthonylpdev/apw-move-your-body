@@ -10,6 +10,7 @@ export type LaserMaterialParams = {
   blur: number
   decay: number
   color: THREE.ColorRepresentation
+  intensity: number
 }
 
 export default class LaserMaterial {
@@ -21,10 +22,9 @@ export default class LaserMaterial {
 
   constructor(
     params: LaserMaterialParams | ObservableState<LaserMaterialParams>,
-    parentGui = MyDat.getGUI()
+    parentGui = null
   ) {
     this.params = 'onChange' in params ? params : observableState(params)
-    this.gui = parentGui.addFolder('LaserMaterial')
 
     this.material = new THREE.RawShaderMaterial({
       fragmentShader,
@@ -33,6 +33,7 @@ export default class LaserMaterial {
         uBlur: { value: this.params.blur },
         uDecay: { value: this.params.decay },
         uColor: { value: new THREE.Color(this.params.color) },
+        uIntensity: { value: this.params.intensity },
       },
       transparent: true,
     })
@@ -48,9 +49,17 @@ export default class LaserMaterial {
       'blur',
       (v) => (this.material.uniforms.uBlur.value = v)
     )
+    this.params.onChange(
+      'intensity',
+      (v) => (this.material.uniforms.uIntensity.value = v)
+    )
 
-    this.gui.addColor(this.params, 'color')
-    this.gui.add(this.params, 'decay', 0, 1, 0.01)
-    this.gui.add(this.params, 'blur', 0, 1, 0.01)
+    if (parentGui) {
+      this.gui = parentGui.addFolder('LaserMaterial')
+      this.gui.addColor(this.params, 'color')
+      this.gui.add(this.params, 'decay', 0, 1, 0.01)
+      this.gui.add(this.params, 'blur', 0, 1, 0.01)
+      this.gui.add(this.params, 'intensity', 0, 1, 0.01)
+    }
   }
 }

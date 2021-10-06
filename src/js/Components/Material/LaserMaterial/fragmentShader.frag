@@ -5,6 +5,7 @@ varying vec2 vUv;
 uniform float uDecay;
 uniform float uBlur;
 uniform vec3 uColor;
+uniform float uIntensity;
 
 float quarticOut(float t) {
   return pow(t - 1.0, 3.0) * (1.0 - t) + 1.0;
@@ -27,7 +28,7 @@ void main() {
 
   float a = abs(vUv.x - 0.5);
   a = smoothstep(0.25 + blur, 0.25 - blur, a);
-  gl_FragColor = vec4(uColor, a * decay);
+  gl_FragColor = vec4(uColor * uIntensity, a * decay);
   // gl_FragColor = vec4(uColor, decay);
   // gl_FragColor = vec4(vec3(vUv, 0.),1.);
 }

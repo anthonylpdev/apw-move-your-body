@@ -1,34 +1,28 @@
 import * as THREE from 'three'
-import MyDat from '../../Utils/MyDat'
-import LaserMaterial from '../Material/LaserMaterial'
-import fragmentShader from './fragmentShader.frag'
-import vertexShader from './vertexShader.vert'
+import Analyser from '../Analyser'
+import BackLaser from './BackLaser'
 
 export default class BackLasers {
-  private meshes: THREE.Mesh[]
+  private lasers: BackLaser[] = []
   public group: THREE.Group
-  private gui: dat.GUI
 
-  constructor(meshes: THREE.Mesh[]) {
-    this.meshes = meshes
+  private state: Analyser['state']
+
+  constructor(meshes: THREE.Mesh[], state: Analyser['state']) {
+    this.state = state
     this.group = new THREE.Group()
-    this.gui = MyDat.getGUI().addFolder('BackLasers')
 
-    const laserMaterial = new LaserMaterial(
-      { blur: 0, decay: 0.2, color: 0xf72ae8 },
-      this.gui
-    )
-    const lights: THREE.SpotLight[] = []
-    for (const mesh of this.meshes) {
-      mesh.material = laserMaterial.material
-      const l = new THREE.SpotLight(0xf72ae8, 20, 20, 0.03, 0.5)
-      l.position.copy(mesh.position)
-      l.position.y += 0.5
-      l.target = mesh
-      lights.push(l)
+    for (const mesh of meshes) {
+      this.lasers.push(new BackLaser(mesh, this.state))
     }
-    console.log(lights)
 
-    this.group.add(...this.meshes, ...lights)
+    this.group.add(
+      ...this.lasers.map((l) => l.mesh),
+      ...this.lasers.map((l) => l.light)
+    )
+  }
+
+  public tick(time: number, delta: number) {
+    for (const laser of this.lasers) laser.tick(time, delta)
   }
 }

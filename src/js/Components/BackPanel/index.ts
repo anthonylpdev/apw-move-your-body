@@ -1,6 +1,7 @@
 import Analyser from '../Analyser'
 import * as THREE from 'three'
 import cremap from '../../Utils/cremap'
+import Easing from 'easing-functions'
 
 export default class BackPanel {
   private meshes: THREE.Mesh[]
@@ -27,6 +28,8 @@ export default class BackPanel {
   public tick(time: number, delta: number) {
     this.matetial.color
       .copy(this.baseColor)
-      .multiplyScalar(cremap(this.state.freqOccupency, [0.15, 1], [0, 1]))
+      .multiplyScalar(
+        cremap(Easing.Quartic.In(this.state.freqOccupency), [0.15, 1], [0, 3])
+      )
   }
 }

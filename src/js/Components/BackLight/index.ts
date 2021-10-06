@@ -3,13 +3,13 @@ import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import cremap from '../../Utils/cremap'
 import MyDat from '../../Utils/MyDat'
 import Analyser from '../Analyser'
-
+import Easing from 'easing-functions'
 export default class BackLight {
   private params = {
     color: 0xe56f00,
     intensity: 2,
     distance: 28,
-    angle: 1.09,
+    angle: 0.8,
     penumbra: 1,
     decay: 0.7,
   }
@@ -76,6 +76,10 @@ export default class BackLight {
   }
 
   public tick(time: number, delta: number) {
-    this.light.intensity = cremap(this.state.freqOccupency, [0.15, 1], [0, 2])
+    this.light.intensity = cremap(
+      Easing.Quartic.In(this.state.freqOccupency),
+      [0.15, 1],
+      [0, 3]
+    )
   }
 }

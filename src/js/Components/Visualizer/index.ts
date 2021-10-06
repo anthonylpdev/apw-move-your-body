@@ -92,14 +92,14 @@ export default class Visualizer {
 
     const s = this.analyserState
 
-    this.debugSound(s.melody1.val / s.melody1.maxVal, 100, 100, 'red')
-    this.debugSound(s.melody2.val / s.melody2.maxVal, 200, 100, 'magenta')
-    this.debugSound(s.melody3.val / s.melody3.maxVal, 300, 100, 'green')
-    this.debugSound(s.melody4.val / s.melody4.maxVal, 400, 100, 'yellow')
-    this.debugSound(s.melody5.val / s.melody5.maxVal, 500, 100, 'white')
-    this.debugSound(s.melody6.val / s.melody6.maxVal, 600, 100, 'orange')
-    this.debugSound(s.melody7.val / s.melody7.maxVal, 700, 100, 'grey')
-    this.debugSound(s.melody8.val / s.melody8.maxVal, 800, 100, 'cyan')
+    this.debugSound(s.melody1.normVal, 100, 100, 'red')
+    this.debugSound(s.melody2.normVal, 200, 100, 'magenta')
+    this.debugSound(s.melody3.normVal, 300, 100, 'green')
+    this.debugSound(s.melody4.normVal, 400, 100, 'yellow')
+    this.debugSound(s.melody5.normVal, 500, 100, 'white')
+    this.debugSound(s.melody6.normVal, 600, 100, 'orange')
+    this.debugSound(s.melody7.normVal, 700, 100, 'grey')
+    this.debugSound(s.melody8.normVal, 800, 100, 'cyan')
     this.debugSound(s.freqOccupency, 100, 200, 'white')
     this.debugSound(s.averageVolume / 100, 200, 200, 'grey')
 

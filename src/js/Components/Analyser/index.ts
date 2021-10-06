@@ -10,14 +10,15 @@ import testHarmonic from '../../Utils/testHarmonic'
 //   }
 // }
 
-class Note {
+export class Note {
   freq: number
   offset: number
 
   private tempVal: number
   private amount: number
-  private computedMaxVal: number = 0
+  // private computedMaxVal: number = 0
 
+  normVal: number
   val: number
   maxVal: number
 
@@ -49,7 +50,8 @@ class Note {
   fixVal(comparator: number) {
     const newVal = this.tempVal / this.amount
     this.val = newVal - comparator
-    this.computedMaxVal = Math.max(this.val, this.computedMaxVal)
+    this.normVal = this.val / this.maxVal
+    // this.computedMaxVal = Math.max(this.val, this.computedMaxVal)
   }
 }
 
@@ -71,7 +73,7 @@ export default class Analyser {
 
   constructor(dataArray: Uint8Array) {
     this.dataArray = dataArray
-    this.state = observableState({
+    this.state = {
       averageVolume: 0,
       melody1: new Note({
         freq: 9.1,
@@ -115,10 +117,10 @@ export default class Analyser {
       }),
       freqOccupency: 0,
       harmonicComparison: 0,
-    })
+    }
   }
 
-  public analyse() {
+  private analyseNotes() {
     const skip = 40
 
     let freqOccupency = 0
@@ -157,5 +159,9 @@ export default class Analyser {
     this.state.freqOccupency = freqOccupency / this.dataArray.length
     for (const k of harmKeys)
       this.state[k].fixVal(this.state.harmonicComparison)
+  }
+
+  public analyse() {
+    this.analyseNotes()
   }
 }

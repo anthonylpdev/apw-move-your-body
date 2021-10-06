@@ -75,7 +75,7 @@ export default class MainScene {
     const frontLasers = gltfChildren.filter((o) => o.name.startsWith('Light_2'))
     const frontLasersObj = new FrontLasers(frontLasers as THREE.Mesh[])
     const backLasers = gltfChildren.filter((o) => o.name.startsWith('Light_1'))
-    const backLasersObj = new BackLasers(backLasers as THREE.Mesh[])
+    const backLasersObj = new BackLasers(backLasers as THREE.Mesh[], this.state)
 
     const backLight = new BackLight(gltf, this.state, lightGui)
     const centerLight = new CenterLight(lightGui)
@@ -87,14 +87,39 @@ export default class MainScene {
 
     middle.material = material
     rightSide.material = material
+    rightSide.visible = false
     leftSide.material = material
+    leftSide.visible = false
+
+    // const floor = gltf.scene.getObjectByName('Plane') as THREE.Mesh
+    // const configT = (t: THREE.Texture) => {
+    //   t.repeat.set(2, 2)
+    //   t.wrapS = THREE.RepeatWrapping
+    //   t.wrapT = THREE.RepeatWrapping
+    // }
+    // const loader = new THREE.TextureLoader()
+    // const floorMat = new THREE.MeshStandardMaterial({
+    //   map: loader.load(
+    //     require('@textures/floor/2K-pebblestone_14-diffuse.jpg').default,
+    //     configT
+    //   ),
+    //   normalMap: loader.load(
+    //     require('@textures/floor/2K-pebblestone_14-normal.jpg').default,
+    //     configT
+    //   ),
+    //   aoMap: loader.load(
+    //     require('@textures/floor/2K-pebblestone_14-ao.jpg').default,
+    //     configT
+    //   ),
+    // })
+    // floor.material = floorMat
 
     const backPanels = gltfChildren.filter((o) =>
       /(Back_light)$/.test(o.name)
     ) as THREE.Mesh[]
     const backPanel = new BackPanel(backPanels, this.state)
 
-    this.tickingObjects.push(backLight, backPanel)
+    this.tickingObjects.push(backLight, backPanel, backLasersObj)
 
     this.scene.add(
       ...untouchedChildren,

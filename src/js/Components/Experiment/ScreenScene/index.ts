@@ -22,8 +22,8 @@ export default class ScreenScene {
     this.scene.background = new THREE.Color('black')
 
     const squares = new AbstractSquares(
-      200,
-      (gltf.scene.getObjectByName('Shape_2') as THREE.Mesh).geometry
+      100,
+      (gltf.scene.getObjectByName('Shape_3') as THREE.Mesh).geometry
     )
     this.tickingObjects.push(squares)
     this.scene.add(this.camera, squares.mesh)
