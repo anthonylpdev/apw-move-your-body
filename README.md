@@ -1,4 +1,4 @@
-# Antho parle web - Creative Contest - Move your body
+# Antho parle web - Creative Contest - Move your body - By Bruno Simon
 
 ![APW for Three.js](apw.png)
 
@@ -11,26 +11,15 @@ Compile the code with a local server (during dev).
 ```
 yarn dev
 ```
-## Objectif
-- Mise en place d'une expérience web audio basée sur la Web Audio API (AnalyserNode / FFT)
-- L'expérience web aura pour principal objectif de permettre une visualisation du son joué
-- Pour l'animation :
-  - tous types de context canvas autorisés (2D, WebGL, WebGL2, etc )
-  - utilisation de librairies et frameworks tierces autorisés (THREE / PIXI / GSAP / etc)
-- Possibilité de choisir un son en particulier si besoin à la condition que ce dernier provienne de la banque EPIDEMIC SOUND (cf Credit)
-- Possibilité d'utiliser le micro plutôt qu'un son
 
-## Inspiration
-- https://bruno-simon.com/lab/experiments/voice-waves/
-- https://mattdesl.github.io/codevember/21.html
-- https://christmasexperiments.com/2016/13/stained-glass/
-- https://twitter.com/anthonylpdev/status/950096675124768770
-- https://experiments.withgoogle.com/webgl-particle-audio-visualizer
+## Participation
 
-## Source
-- https://engineering.carsguide.com.au/javascripts-web-audio-api-3ad0e624945
-- https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/fftSize
-- http://ixd.education/2014/02/digital-lab-lanalyse-audio-et-lutilisation-de-donnees-fft/
+Initialement, ce projet était une expérimentation basée sur [cette oeuvre](https://rarible.com/token/0xd07dc4262bcdbf85190c01c996b4c06a461d2430:300573:0xbcfba32709f59838121c0007dc1ca6e8b7432011?tab=owners)
 
-## Credit
-- https://www.epidemicsound.com/
+La sphère devait être animée de façon aléatoire, mais cela manquait d'interaction. J'ai donc décidé d'utiliser le micro pour modifier les différents paramètres de la forme et, au même moment, j'ai eu vent du concours. J'ai donc décidé d'orienté mon experience dans cette direction.
+
+La sphère est une simple géométrie avec un nombre très élevé de subdivision (qui explique les performances un peu limites).
+
+Les ondulations sont gérées dans un vertex shader avec une combinaison de perlin qui rapproche ou éloigne la vertice de sa position d'origine.
+
+La principale difficulté était de gérer les normales. Les normales de bases sont orientées vers l'extérieur de la sphère sauf qu'avec les ondulations, ce n'est plus le cas. Il a été nécessaire de calculer chaque normal "computed" par rapport aux normales voisines avec un produit en croix (cross product).
