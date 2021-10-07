@@ -47,13 +47,13 @@ export default class Experiment {
     this.composer = new EffectComposer(renderer)
     this.renderTarget = new THREE.WebGLMultisampleRenderTarget(256, 256)
     this.renderer = renderer
-    this.screenScene = new ScreenScene(gltf)
     this.mainScene = new MainScene(
       renderer,
       gltf,
       this.renderTarget,
       this.analyser.state
     )
+    this.screenScene = new ScreenScene(gltf, this.mainScene.camera)
 
     const renderPass = new RenderPass(
       this.mainScene.scene,
@@ -89,7 +89,6 @@ export default class Experiment {
         this.audio.setAtProg(remap(Number(e.key), [0, 10], [0, 1]))
       if (e.key === '+') this.audio.forward()
       if (e.key === '-') this.audio.back()
-      // if (e.key === 'l') console.log(this.analyser.state)
     })
   }
 

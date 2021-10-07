@@ -18,6 +18,9 @@ export default class MainScene {
   private state: Analyser['state']
 
   private tickingObjects: { tick: (time: number, delta: number) => void }[] = []
+  private targetCursor: THREE.Vector2 = new THREE.Vector2()
+  private cursor: THREE.Vector2 = new THREE.Vector2()
+  private cameraNull: THREE.Object3D
 
   constructor(
     renderer: THREE.WebGLRenderer,
@@ -35,14 +38,17 @@ export default class MainScene {
     const camRoot = gltf.scene.getObjectByName('Camera')
     this.camera = camRoot.children[0] as THREE.PerspectiveCamera
 
-    this.camera.position.copy(camRoot.position)
+    this.cameraNull = new THREE.Object3D()
+    this.cameraNull.position.set(0, 4.673530578613281, -9.32719898223877)
+
+    this.camera.position.z = 35
     camRoot.quaternion.multiply(this.camera.quaternion)
     this.camera.quaternion.copy(camRoot.quaternion)
-    const controls = new OrbitControls(this.camera, this.renderer.domElement)
-    controls.target.set(0, 6.673530578613281, -9.32719898223877)
-    controls.enabled = false
-    controls.update()
-    MyDat.getGUI().add(controls, 'enabled').name('orbitControls')
+    // const controls = new OrbitControls(this.camera, this.renderer.domElement)
+    // controls.target.set(0, 6.673530578613281, -9.32719898223877)
+    // controls.enabled = false
+    // controls.update()
+    // MyDat.getGUI().add(controls, 'enabled').name('orbitControls')
     MyDat.getGUI()
       .add(this.camera, 'fov', 20, 45, 0.1)
       .onChange(() => this.camera.updateProjectionMatrix())
@@ -54,6 +60,10 @@ export default class MainScene {
     resize()
 
     window.addEventListener('resize', resize)
+    window.addEventListener('mousemove', (event) => {
+      this.targetCursor.x = (event.clientX / window.innerWidth) * 2 - 1
+      this.targetCursor.y = -(event.clientY / window.innerHeight) * 2 + 1
+    })
   }
 
   private setObjects(gltf: GLTF, renderTarget: THREE.WebGLRenderTarget) {
@@ -71,7 +81,6 @@ export default class MainScene {
         !/(Back_light)$/.test(o.name)
     )
 
-    console.log(untouchedChildren)
     const frontLasers = gltfChildren.filter((o) => o.name.startsWith('Light_2'))
     const frontLasersObj = new FrontLasers(
       frontLasers as THREE.Mesh[],
@@ -94,29 +103,6 @@ export default class MainScene {
     leftSide.material = material
     leftSide.visible = false
 
-    // const floor = gltf.scene.getObjectByName('Plane') as THREE.Mesh
-    // const configT = (t: THREE.Texture) => {
-    //   t.repeat.set(2, 2)
-    //   t.wrapS = THREE.RepeatWrapping
-    //   t.wrapT = THREE.RepeatWrapping
-    // }
-    // const loader = new THREE.TextureLoader()
-    // const floorMat = new THREE.MeshStandardMaterial({
-    //   map: loader.load(
-    //     require('@textures/floor/2K-pebblestone_14-diffuse.jpg').default,
-    //     configT
-    //   ),
-    //   normalMap: loader.load(
-    //     require('@textures/floor/2K-pebblestone_14-normal.jpg').default,
-    //     configT
-    //   ),
-    //   aoMap: loader.load(
-    //     require('@textures/floor/2K-pebblestone_14-ao.jpg').default,
-    //     configT
-    //   ),
-    // })
-    // floor.material = floorMat
-
     const backPanels = gltfChildren.filter((o) =>
       /(Back_light)$/.test(o.name)
     ) as THREE.Mesh[]
@@ -138,10 +124,14 @@ export default class MainScene {
       backPanel.group
       // new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial())
     )
-    this.scene.add(this.camera)
+    this.cameraNull.add(this.camera)
+    this.scene.add(this.cameraNull)
   }
 
   public tick(time: number, delta: number) {
+    this.cursor.lerp(this.targetCursor, 0.02)
+    this.cameraNull.rotation.x = this.cursor.y * 0.05
+    this.cameraNull.rotation.y = this.cursor.x * 0.3
     for (const obj of this.tickingObjects) obj.tick(time, delta)
   }
 }

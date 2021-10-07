@@ -1,11 +1,6 @@
 import * as THREE from 'three'
-import MyDat from '../../Utils/MyDat'
 import Analyser from '../Analyser'
-import BackLaser from '../BackLasers/BackLaser'
-import LaserMaterial from '../Material/LaserMaterial'
-import fragmentShader from './fragmentShader.frag'
 import FrontLaser from './FrontLaser'
-import vertexShader from './vertexShader.vert'
 
 const assoc = {
   ['Light_2001']: ['melody1', 'melody2'],
@@ -22,9 +17,9 @@ export default class FrontLasers {
   private lasers: FrontLaser[] = []
   public group: THREE.Group
   private state: Analyser['state']
+  private firstBass: boolean = false
 
   constructor(meshes: THREE.Mesh[], state: Analyser['state']) {
-    console.log(meshes)
     this.state = state
     this.group = new THREE.Group()
 
@@ -32,9 +27,14 @@ export default class FrontLasers {
       this.lasers.push(new FrontLaser(mesh, this.state, assoc[mesh.name]))
 
     this.group.add(...this.lasers.map((l) => l.mesh))
+    this.group.visible = false
   }
 
   public tick(time: number, delta: number) {
+    if (!this.firstBass && this.state.freqOccupency > 0.7) {
+      this.group.visible = true
+      this.firstBass = true
+    }
     for (const laser of this.lasers) laser.tick(time, delta)
   }
 }

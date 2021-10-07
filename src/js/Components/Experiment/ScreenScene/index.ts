@@ -5,10 +5,17 @@ import AbstractSquares from '../../AbstractSquares'
 export default class ScreenScene {
   public scene: THREE.Scene
   public camera: THREE.PerspectiveCamera
+  private mainCamera: THREE.PerspectiveCamera
+  private correctionQuat = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    Math.PI / 4
+  )
+  private identityQuat = new THREE.Quaternion()
 
   private tickingObjects: { tick: (time: number, delta: number) => void }[] = []
 
-  constructor(gltf: GLTF) {
+  constructor(gltf: GLTF, camera: THREE.PerspectiveCamera) {
+    this.mainCamera = camera
     this.setCamera(gltf)
     this.setObjects(gltf)
   }
@@ -30,6 +37,9 @@ export default class ScreenScene {
   }
 
   public tick(time: number, delta: number) {
+    this.mainCamera.getWorldQuaternion(this.camera.quaternion)
+    this.camera.quaternion.slerp(this.identityQuat, 0.5)
+    this.camera.quaternion.multiply(this.correctionQuat)
     for (const obj of this.tickingObjects) obj.tick(time, delta)
   }
 }

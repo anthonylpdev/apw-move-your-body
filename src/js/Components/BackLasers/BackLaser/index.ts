@@ -36,6 +36,7 @@ export default class BackLaser {
   private state: Analyser['state']
   private laserState: ObservableState<LaserMaterialParams>
   private enable: boolean = false
+  private firstBass: boolean = false
 
   constructor(mesh: THREE.Mesh, state: Analyser['state']) {
     this.state = state
@@ -44,7 +45,7 @@ export default class BackLaser {
       blur: 0,
       decay: 0.5,
       color: 0xf72ae8,
-      intensity: 0,
+      intensity: 1,
     })
     this.mat = new LaserMaterial(
       this.laserState
@@ -52,7 +53,7 @@ export default class BackLaser {
     )
     this.mesh.material = this.mat.material
 
-    this.light = new THREE.SpotLight(0xf72ae8, 0, 20, 0.03, 0.5)
+    this.light = new THREE.SpotLight(0xf72ae8, 5, 20, 0.03, 0.5)
     this.light.position.copy(mesh.position)
     this.light.position.y += 0.5
     this.light.target = mesh
@@ -61,12 +62,13 @@ export default class BackLaser {
   }
 
   public tick(time: number, delta: number) {
-    let value = this.enable ? 1 : 0
-    this.light.intensity = value * 5
-    this.laserState.intensity = value
-
-    let color = 0xf72ae8
-    let max = 0
+    if (!this.firstBass && this.state.freqOccupency > 0.7) {
+      this.enable = true
+      this.firstBass = true
+    }
+    if (this.state.bass.speed > 0.5) this.enable = !this.enable
+    this.light.visible = this.enable
+    this.mesh.visible = this.enable
 
     const keys = Object.keys(colors)
 
@@ -77,26 +79,6 @@ export default class BackLaser {
     if (Math.abs(c[0].note.normVal - c[1].note.normVal) > 0.05)
       this.laserState.color = c[0].color
 
-    // let totalVal = 0
-    // for (const k of keys) {
-    //   const note = this.state[k] as Note
-    //   totalVal += note.val
-    // }
-    // for (const k of keys) {
-    //   const note = this.state[k] as Note
-    //   const inf = note.val / totalVal
-    //   rgb.r += (colors[k].r * inf) / 255
-    //   rgb.g += (colors[k].g * inf) / 255
-    //   rgb.b += (colors[k].b * inf) / 255
-    // }
-    // ;(this.mat.material.uniforms.uColor.value as THREE.Color).setRGB(
-    //   rgb.r,
-    //   rgb.g,
-    //   rgb.b
-    // )
-
     // if (this.state.freqOccupency > 0.7) this.enable = true
-    console.log(this.state.bass.speed)
-    if (this.state.bass.speed > 0.5) this.enable = !this.enable
   }
 }

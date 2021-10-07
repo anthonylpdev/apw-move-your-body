@@ -49,8 +49,6 @@ export default class AbstractSquares {
 
     for (let index = 0; index < amount; index++)
       this.mesh.setMatrixAt(index, new THREE.Matrix4())
-
-    console.log(this.mesh)
   }
 
   private createGeometry(amount: number, origGeometry: THREE.BufferGeometry) {
