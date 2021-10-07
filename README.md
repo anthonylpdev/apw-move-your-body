@@ -10,11 +10,11 @@ Code by Synn, licence : [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 [THREE.js](https://github.com/mrdoob/three.js) library: [MIT License](https://github.com/mrdoob/three.js/blob/dev/LICENSE)
 
-[music-tempo](https://github.com/killercrush/music-tempo) library: [MIT License](https://github.com/killercrush/music-tempo/blob/master/LICENCE)
+[music-tempo](https://github.com/killercrush/music-tempo) library: [MIT License](https://creativecommons.org/publicdomain/zero/1.0/)
 
 Music "Crystal Cave" (song18.mp3) and "Battle Theme A" by [The Cynic Project](https://cynicmusic.com/), licence : [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 
-Music "No More Magic" by [HorrorPen](https://opengameart.org/users/horrorpen), licence : [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/zero/1.0/)
+Music "No More Magic" by [HorrorPen](https://opengameart.org/users/horrorpen), licence : [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 
 ## Demo
  https://onivers.com/ahypermaze/
