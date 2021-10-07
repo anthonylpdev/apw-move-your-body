@@ -30,21 +30,23 @@ export default class Experiment {
   private headScene: HeadScene
 
   constructor(renderer: THREE.WebGLRenderer, gltf: GLTF) {
-    const startOnAudio = false
-    const volume = 0.4
+    const p = {
+      enableKeys: false,
+    }
+    MyDat.getGUI().add(p, 'enableKeys')
 
     this.clock = new THREE.Clock(true)
-    this.audio = new Audio(volume)
+    this.audio = new Audio(0.4)
     this.analyser = new Analyser(this.audio.dataArray)
     this.visualizer = new Visualizer(
       this.audio.dataArray,
-      startOnAudio,
+      false,
       this.analyser.state
     )
 
     this.composer = new EffectComposer(renderer)
     this.renderTarget = new THREE.WebGLMultisampleRenderTarget(256, 256)
-    this.renderTarget2 = new THREE.WebGLMultisampleRenderTarget(256, 256)
+    this.renderTarget2 = new THREE.WebGLMultisampleRenderTarget(128, 128)
     this.renderer = renderer
     this.mainScene = new MainScene(
       renderer,
@@ -78,18 +80,18 @@ export default class Experiment {
     bloomPassGui.add(bloomPass, 'strength', 0, 3, 0.01)
     this.composer.addPass(bloomPass)
 
-    if (startOnAudio) this.audio.play()
     this.popin = document.querySelector('#intro')
 
     document.querySelector('#click-me').addEventListener('click', (event) => {
       event.preventDefault()
       this.popin.classList.add('hide')
-      // setTimeout(() => {
-      //   this.audio.play()
-      // }, 1000)
+      setTimeout(() => {
+        this.audio.play()
+      }, 1000)
     })
 
     document.addEventListener('keypress', (e) => {
+      if (!p.enableKeys) return
       if (e.key === ' ') this.audio.toggle()
       if (/^\d$/.test(e.key))
         this.audio.setAtProg(remap(Number(e.key), [0, 10], [0, 1]))
@@ -109,16 +111,24 @@ export default class Experiment {
     this.headScene.tick(elapsedTime, deltaTime)
 
     this.renderer.setRenderTarget(this.renderTarget)
-    this.renderer.setSize(this.renderTarget.width, this.renderTarget.height)
+    // this.renderer.setSize(
+    //   this.renderTarget.width,
+    //   this.renderTarget.height,
+    //   false
+    // )
     this.renderer.render(this.screenScene.scene, this.screenScene.camera)
 
     this.renderer.setRenderTarget(this.renderTarget2)
     // this.renderer.setRenderTarget(null)
-    this.renderer.setSize(this.renderTarget2.width, this.renderTarget2.height)
+    // this.renderer.setSize(
+    //   this.renderTarget2.width,
+    //   this.renderTarget2.height,
+    //   false
+    // )
     this.renderer.render(this.headScene.scene, this.headScene.camera)
 
     this.renderer.setRenderTarget(null)
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    // this.renderer.setSize(window.innerWidth, window.innerHeight, false)
     this.composer.render()
   }
 }

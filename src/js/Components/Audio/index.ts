@@ -9,7 +9,7 @@ export default class Audio {
   private bufferLength: number
   public dataArray: Uint8Array
 
-  private gui = MyDat.getGUI().addFolder('audio')
+  // private gui = MyDat.getGUI().addFolder('audio')
 
   constructor(volume: number = 0.05) {
     this.audio = document.querySelector('audio')
@@ -41,7 +41,7 @@ export default class Audio {
     this.dataArray = new Uint8Array(this.bufferLength)
 
     this.audio.volume = volume
-    this.gui.add(this.audio, 'volume', 0, 1)
+    // this.gui.add(this.audio, 'volume', 0, 1)
   }
 
   public play() {

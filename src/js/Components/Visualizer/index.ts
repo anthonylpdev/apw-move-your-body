@@ -149,6 +149,7 @@ export default class Visualizer {
   }
 
   private initGui() {
+    this.gui.open()
     this.gui.add(this, 'isVisible').name('show')
     this.gui.add(this.zoom, 'min', 0, this.dataArray.length, 1)
     this.gui.add(this.zoom, 'max', 0, this.dataArray.length, 1)

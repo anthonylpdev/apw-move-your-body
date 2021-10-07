@@ -56,14 +56,18 @@ export default class GPGPU {
     this.setQuadTexture(initTexture)
 
     this.renderer.getSize(this.rendererSizeTemp)
-    this.renderer.setSize(this.size.x, this.size.y)
+    // this.renderer.setSize(this.size.x, this.size.y, false)
 
     this.renderer.setRenderTarget(this.targetA)
     this.renderer.render(this.scene, this.camera)
 
     this.renderer.setRenderTarget(this.targetB)
     this.renderer.render(this.scene, this.camera)
-    this.renderer.setSize(this.rendererSizeTemp.x, this.rendererSizeTemp.y)
+    // this.renderer.setSize(
+    //   this.rendererSizeTemp.x,
+    //   this.rendererSizeTemp.y,
+    //   false
+    // )
     this.outputTexture = this.targetB.texture
   }
 
@@ -76,7 +80,7 @@ export default class GPGPU {
     this.setQuadTexture(this.targetA.texture)
 
     this.renderer.getSize(this.rendererSizeTemp)
-    this.renderer.setSize(this.size.x, this.size.y)
+    // this.renderer.setSize(this.size.x, this.size.y, false)
     this.renderer.setRenderTarget(this.targetB)
     // this.renderer.setRenderTarget(null)
     this.renderer.render(this.scene, this.camera)
@@ -84,6 +88,10 @@ export default class GPGPU {
 
     this.renderer.setRenderTarget(null)
     this.outputTexture = this.targetB.texture
-    this.renderer.setSize(this.rendererSizeTemp.x, this.rendererSizeTemp.y)
+    // this.renderer.setSize(
+    //   this.rendererSizeTemp.x,
+    //   this.rendererSizeTemp.y,
+    //   false
+    // )
   }
 }
