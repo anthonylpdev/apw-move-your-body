@@ -11,25 +11,23 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import MyDat from '../../Utils/MyDat'
 import Analyser from '../Analyser'
-
-export type AppState = ObservableState<{ anim: Anims }>
-
-export type Anims = 'rotate' | 'snapX' | 'start' | 'reset'
+import HeadScene from './HeadScene'
 
 export default class Experiment {
   private renderer: THREE.WebGLRenderer
 
   private mainScene: MainScene
   private screenScene: ScreenScene
-  private state: AppState = observableState({ anim: 'start' })
 
   private clock: THREE.Clock
   private visualizer: Visualizer
   private audio: Audio
   private popin: HTMLElement
   private renderTarget: THREE.WebGLMultisampleRenderTarget
+  private renderTarget2: THREE.WebGLMultisampleRenderTarget
   private composer: EffectComposer
   private analyser: Analyser
+  private headScene: HeadScene
 
   constructor(renderer: THREE.WebGLRenderer, gltf: GLTF) {
     const startOnAudio = false
@@ -46,11 +44,18 @@ export default class Experiment {
 
     this.composer = new EffectComposer(renderer)
     this.renderTarget = new THREE.WebGLMultisampleRenderTarget(256, 256)
+    this.renderTarget2 = new THREE.WebGLMultisampleRenderTarget(256, 256)
     this.renderer = renderer
     this.mainScene = new MainScene(
       renderer,
       gltf,
       this.renderTarget,
+      this.renderTarget2,
+      this.analyser.state
+    )
+    this.headScene = new HeadScene(
+      gltf,
+      this.mainScene.camera,
       this.analyser.state
     )
     this.screenScene = new ScreenScene(gltf, this.mainScene.camera)
@@ -62,6 +67,7 @@ export default class Experiment {
     this.composer.addPass(renderPass)
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
+      // 0,
       1.2,
       0,
       0
@@ -100,10 +106,16 @@ export default class Experiment {
     this.analyser.analyse()
     this.mainScene.tick(elapsedTime, deltaTime)
     this.screenScene.tick(elapsedTime, deltaTime)
+    this.headScene.tick(elapsedTime, deltaTime)
 
     this.renderer.setRenderTarget(this.renderTarget)
     this.renderer.setSize(this.renderTarget.width, this.renderTarget.height)
     this.renderer.render(this.screenScene.scene, this.screenScene.camera)
+
+    this.renderer.setRenderTarget(this.renderTarget2)
+    // this.renderer.setRenderTarget(null)
+    this.renderer.setSize(this.renderTarget2.width, this.renderTarget2.height)
+    this.renderer.render(this.headScene.scene, this.headScene.camera)
 
     this.renderer.setRenderTarget(null)
     this.renderer.setSize(window.innerWidth, window.innerHeight)

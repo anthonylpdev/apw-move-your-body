@@ -7,10 +7,6 @@ uniform float uBlur;
 uniform vec3 uColor;
 uniform float uIntensity;
 
-float quarticOut(float t) {
-  return pow(t - 1.0, 3.0) * (1.0 - t) + 1.0;
-}
-
 float remap(float value, float start1, float stop1, float start2, float stop2)
 {
     return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
@@ -22,7 +18,6 @@ float cremap(float value, float start1, float stop1, float start2, float stop2) 
 }
 
 void main() {
-  float y = quarticOut(vUv.y);
   float blur = cremap(vUv.y, 0., 1., 0.01, (1. - uBlur) / 4.);
   float decay = cremap(vUv.y, 0., 1., 1., 1. - uDecay);
 

@@ -2,13 +2,14 @@ import * as THREE from 'three'
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import MyDat from '../../../Utils/MyDat'
-import { AppState } from '..'
 import FrontLasers from '../../FrontLasers'
 import BackLight from '../../BackLight'
 import CenterLight from '../../CenterLight'
 import BackLasers from '../../BackLasers'
 import Analyser from '../../Analyser'
 import BackPanel from '../../BackPanel'
+import Silhouette from '../../Silhouette'
+import ScreenMaterial from '../../Material/ScreenMaterial'
 
 export default class MainScene {
   public scene: THREE.Scene
@@ -26,12 +27,13 @@ export default class MainScene {
     renderer: THREE.WebGLRenderer,
     gltf: GLTF,
     renderTarget: THREE.WebGLRenderTarget,
+    renderTarget2: THREE.WebGLRenderTarget,
     state: Analyser['state']
   ) {
     this.state = state
     this.renderer = renderer
     this.setCamera(gltf)
-    this.setObjects(gltf, renderTarget)
+    this.setObjects(gltf, renderTarget, renderTarget2)
   }
 
   private setCamera(gltf: GLTF) {
@@ -66,7 +68,11 @@ export default class MainScene {
     })
   }
 
-  private setObjects(gltf: GLTF, renderTarget: THREE.WebGLRenderTarget) {
+  private setObjects(
+    gltf: GLTF,
+    renderTarget: THREE.WebGLRenderTarget,
+    renderTarget2: THREE.WebGLRenderTarget
+  ) {
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0x000000)
 
@@ -78,6 +84,7 @@ export default class MainScene {
         !o.name.startsWith('Light') &&
         !o.name.startsWith('Shape') &&
         o.name !== 'Middle_Back_light_Null' &&
+        o.name !== 'Head' &&
         !/(Back_light)$/.test(o.name)
     )
 
@@ -94,14 +101,25 @@ export default class MainScene {
     const middle = gltf.scene.getObjectByName('Middle') as THREE.Mesh
     const rightSide = gltf.scene.getObjectByName('Right_Side') as THREE.Mesh
     const leftSide = gltf.scene.getObjectByName('Left_Side') as THREE.Mesh
-    const material = new THREE.MeshBasicMaterial()
-    material.map = renderTarget.texture
+    const screenMaterial = new ScreenMaterial({
+      map: renderTarget.texture,
+      ratio: 1,
+    })
 
-    middle.material = material
-    rightSide.material = material
+    middle.material = screenMaterial.material
+    rightSide.material = screenMaterial.material
     rightSide.visible = false
-    leftSide.material = material
+    leftSide.material = screenMaterial.material
     leftSide.visible = false
+
+    const sLeft = gltf.scene.getObjectByName('Sound_Left') as THREE.Mesh
+    const sRight = gltf.scene.getObjectByName('Sound_Right') as THREE.Mesh
+    const panelMaterial = new ScreenMaterial({
+      map: renderTarget2.texture,
+      ratio: 1,
+    })
+    sLeft.material = panelMaterial.material
+    sRight.material = panelMaterial.material
 
     const backPanels = gltfChildren.filter((o) =>
       /(Back_light)$/.test(o.name)
@@ -114,6 +132,7 @@ export default class MainScene {
       backLasersObj,
       frontLasersObj
     )
+    const sil = new Silhouette()
 
     this.scene.add(
       ...untouchedChildren,
@@ -121,7 +140,8 @@ export default class MainScene {
       frontLasersObj.group,
       backLasersObj.group,
       backLight.group,
-      backPanel.group
+      backPanel.group,
+      sil.mesh
       // new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial())
     )
     this.cameraNull.add(this.camera)

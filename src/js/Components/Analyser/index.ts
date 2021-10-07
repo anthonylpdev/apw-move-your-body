@@ -1,3 +1,4 @@
+import { lerp } from 'three/src/math/MathUtils'
 import observableState, { ObservableState } from '../../Utils/observableState'
 import testHarmonic from '../../Utils/testHarmonic'
 
@@ -21,6 +22,7 @@ export class Note {
   normVal: number
   val: number
   maxVal: number
+  easeVal: number = 0
 
   constructor({
     freq,
@@ -51,6 +53,8 @@ export class Note {
     const newVal = this.tempVal / this.amount
     this.val = newVal - comparator
     this.normVal = this.val / this.maxVal
+    this.easeVal =
+      this.normVal > this.easeVal ? this.normVal : this.easeVal - 0.02
     // this.computedMaxVal = Math.max(this.val, this.computedMaxVal)
   }
 }
