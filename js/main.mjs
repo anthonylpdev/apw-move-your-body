@@ -134,12 +134,3 @@ function getChannel(buffer) {
   const chan2 = buffer.getChannelData(1);
   return chan1.map((val, i) => (val + chan2[i]) / 2);
 }
-
-function shuffle(array) {
-  const clone = [...array];
-  for (let i = clone.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [clone[i], clone[j]] = [clone[j], clone[i]];
-  }
-  return clone;
-}
