@@ -37,12 +37,8 @@ export default class Experiment {
 
     this.clock = new THREE.Clock(true)
     this.audio = new Audio(0.4)
-    this.analyser = new Analyser(this.audio.dataArray)
-    this.visualizer = new Visualizer(
-      this.audio.dataArray,
-      false,
-      this.analyser.state
-    )
+    this.analyser = new Analyser(this.audio)
+    this.visualizer = new Visualizer(this.audio, false, this.analyser.state)
 
     this.composer = new EffectComposer(renderer)
     this.renderTarget = new THREE.WebGLMultisampleRenderTarget(256, 256)

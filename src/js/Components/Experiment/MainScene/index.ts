@@ -34,6 +34,7 @@ export default class MainScene {
     this.renderer = renderer
     this.setCamera(gltf)
     this.setObjects(gltf, renderTarget, renderTarget2)
+    this.renderer.compile(this.scene, this.camera)
   }
 
   private setCamera(gltf: GLTF) {

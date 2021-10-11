@@ -1,10 +1,12 @@
+import { frequencyToIndex } from '../../Utils/frequencyConversion'
 import MyDat from '../../Utils/MyDat'
 import testHarmonic from '../../Utils/testHarmonic'
 import Analyser from '../Analyser'
+import Audio from '../Audio'
 
 export default class Visualizer {
   private canvas: HTMLCanvasElement
-  private dataArray: Uint8Array
+  private audio: Audio
   private ctx: CanvasRenderingContext2D
   private WIDTH: number
   private HEIGHT: number
@@ -16,8 +18,8 @@ export default class Visualizer {
   public analyserState: Analyser['state']
 
   private harm = {
-    freq: 27,
-    offset: -3,
+    freq: 656.7626953125,
+    offset: 12.919921875,
   }
   // private harm = {
   //   freq: 15,
@@ -52,14 +54,14 @@ export default class Visualizer {
   private gui = MyDat.getGUI().addFolder('visualizer')
 
   constructor(
-    buffer: Uint8Array,
+    audio: Audio,
     startVisible: boolean,
     analyserState: Analyser['state']
   ) {
     this.analyserState = analyserState
-    this.dataArray = buffer
+    this.audio = audio
     this.canvas = document.querySelector('#visualizer-canvas')
-    this.zoom = { max: this.dataArray.length - 1, min: 0 }
+    this.zoom = { max: this.audio.dataArray.length - 1, min: 0 }
     this.isVisible = startVisible
 
     this.initCanvas()
@@ -105,12 +107,23 @@ export default class Visualizer {
     this.debugSound(s.bass.current / s.bass.max, 300, 200, 'red')
     this.debugSound(s.bass.speed, 400, 200, 'red')
 
+    const treshold = this.audio.convertIndexToFrequency(0.5)
     for (let i = this.zoom.min; i <= this.zoom.max; i++) {
-      this.barHeight = this.dataArray[i] * 3
+      this.barHeight = this.audio.dataArray[i] * 3
       let r = this.barHeight + 25 * (i / length)
       let g = 250 * (i / length)
       let b = 50
-      if (testHarmonic(i, this.harm.freq, this.harm.offset)) {
+
+      if (
+        testHarmonic(
+          this.audio.convertIndexToFrequency(i),
+          this.harm.freq,
+          this.harm.offset,
+          treshold
+        )
+      ) {
+        // if (i === this.audio.convertFrequencyToIndex(this.harm.freq)) {
+        // if (testHarmonic(i, this.harm.freq, this.harm.offset)) {
         this.ctx.fillStyle = 'blue'
       } else this.ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')'
       this.ctx.fillRect(
@@ -151,9 +164,9 @@ export default class Visualizer {
   private initGui() {
     this.gui.open()
     this.gui.add(this, 'isVisible').name('show')
-    this.gui.add(this.zoom, 'min', 0, this.dataArray.length, 1)
-    this.gui.add(this.zoom, 'max', 0, this.dataArray.length, 1)
-    this.gui.add(this.harm, 'freq').step(0.1)
-    this.gui.add(this.harm, 'offset').step(0.1)
+    this.gui.add(this.zoom, 'min', 0, this.audio.dataArray.length, 1)
+    this.gui.add(this.zoom, 'max', 0, this.audio.dataArray.length, 1)
+    this.gui.add(this.harm, 'freq').step(1)
+    this.gui.add(this.harm, 'offset').step(1)
   }
 }

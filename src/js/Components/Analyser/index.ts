@@ -1,6 +1,7 @@
 import { lerp } from 'three/src/math/MathUtils'
 import observableState, { ObservableState } from '../../Utils/observableState'
 import testHarmonic from '../../Utils/testHarmonic'
+import Audio from '../Audio'
 
 // type Harmonic = {
 //   freq: number,
@@ -31,7 +32,7 @@ export class Note {
   }: {
     freq: number
     offset: number
-    maxVal
+    maxVal: number
   }) {
     this.freq = freq
     this.maxVal = maxVal
@@ -43,8 +44,8 @@ export class Note {
     this.amount = 0
   }
 
-  add(index: number, value: number) {
-    if (!testHarmonic(index, this.freq, this.offset)) return
+  add(dataFreq: number, value: number, treshold: number) {
+    if (!testHarmonic(dataFreq, this.freq, this.offset, treshold)) return
     this.tempVal += value
     this.amount++
   }
@@ -63,7 +64,7 @@ let bassMax = 0
 let bassSpeedMax = 0
 
 export default class Analyser {
-  private dataArray: Uint8Array
+  private audio: Audio
   public state: {
     averageVolume: number
     melody1: Note
@@ -85,48 +86,48 @@ export default class Analyser {
     }
   }
 
-  constructor(dataArray: Uint8Array) {
-    this.dataArray = dataArray
+  constructor(audio: Audio) {
+    this.audio = audio
     this.state = {
       averageVolume: 0,
       melody1: new Note({
-        freq: 9.1,
-        offset: 0.4, // Melody
+        freq: 195.9521484375,
+        offset: 8.61328125, // Melody
         maxVal: 8.23,
       }),
       melody2: new Note({
-        freq: 10.2,
-        offset: 0.5, // Melody
+        freq: 219.63867187499997,
+        offset: 10.7666015625, // Melody
         maxVal: 10.87,
       }),
       melody3: new Note({
-        freq: 15.3,
-        offset: 0.2, // Melody
+        freq: 329.4580078125,
+        offset: 4.306640625, // Melody
         maxVal: 19.4,
       }),
       melody4: new Note({
-        freq: 18.1,
-        offset: 2.9, // Melody
+        freq: 389.75097656250006,
+        offset: 62.4462890625, // Melody
         maxVal: 18.2,
       }),
       melody5: new Note({
-        freq: 20.3,
-        offset: 2.9, // Melody
+        freq: 437.1240234375,
+        offset: 62.4462890625, // Melody
         maxVal: 17.37,
       }),
       melody6: new Note({
-        freq: 22.9,
-        offset: 0.4, // Melody Higher than 27/-3
+        freq: 493.11035156249994,
+        offset: 8.61328125, // Melody Higher than 27/-3
         maxVal: 25.83,
       }),
       melody7: new Note({
-        freq: 27.2,
+        freq: 585.703125,
         offset: 0, // Melody 2
         maxVal: 24.6,
       }),
       melody8: new Note({
-        freq: 30.5,
-        offset: 0.6, // Melody Higher than 27/-3
+        freq: 656.7626953125,
+        offset: 12.919921875,
         maxVal: 28.18,
       }),
       freqOccupency: 0,
@@ -158,28 +159,31 @@ export default class Analyser {
       'melody8',
     ]
 
-    for (const k of harmKeys) this.state[k].reset()
+    for (const k of harmKeys) (this.state[k] as Note).reset()
 
     let avVolume = 0
-    for (let i = 0; i < this.dataArray.length; i++) {
-      const d = this.dataArray[i]
+    const treshold = this.audio.convertIndexToFrequency(0.5)
+    for (let i = 0; i < this.audio.dataArray.length; i++) {
+      const d = this.audio.dataArray[i]
       if (d > 40) freqOccupency++
       if (i > skip) {
         harmCompAmount++
         harmCompVal += d
+        const indexFreq = this.audio.convertIndexToFrequency(i)
 
-        for (const k of harmKeys) this.state[k].add(i, d)
+        for (const k of harmKeys)
+          (this.state[k] as Note).add(indexFreq, d, treshold)
       }
       avVolume += d
     }
 
     harmCompVal /= harmCompAmount
-    avVolume /= this.dataArray.length
+    avVolume /= this.audio.dataArray.length
     this.state.harmonicComparison = harmCompVal
     this.state.averageVolume = avVolume
-    this.state.freqOccupency = freqOccupency / this.dataArray.length
+    this.state.freqOccupency = freqOccupency / this.audio.dataArray.length
     for (const k of harmKeys)
-      this.state[k].fixVal(this.state.harmonicComparison)
+      (this.state[k] as Note).fixVal(this.state.harmonicComparison)
   }
 
   public analyse() {
@@ -187,8 +191,8 @@ export default class Analyser {
 
     this.state.bass.previous = this.state.bass.current
     this.state.bass.current =
-      Math.max(this.dataArray[3] - 200, 0) +
-      Math.max(this.dataArray[2] - 180, 0)
+      Math.max(this.audio.dataArray[3] - 200, 0) +
+      Math.max(this.audio.dataArray[2] - 180, 0)
     this.state.bass.speed =
       Math.max(this.state.bass.current - this.state.bass.previous, 0) /
       this.state.bass.maxSpeed

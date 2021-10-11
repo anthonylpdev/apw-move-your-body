@@ -1,5 +1,9 @@
-import MyDat from '../../Utils/MyDat'
+import {
+  frequencyToIndex,
+  indexToFrequency,
+} from '../../Utils/frequencyConversion'
 import remap from '../../Utils/remap'
+import testHarmonic from '../../Utils/testHarmonic'
 
 export default class Audio {
   private audio: HTMLAudioElement
@@ -76,5 +80,21 @@ export default class Audio {
 
   public update() {
     this.analyser.getByteFrequencyData(this.dataArray)
+  }
+
+  public convertIndexToFrequency(index: number) {
+    return indexToFrequency(
+      index,
+      this.dataArray.length,
+      this.context.sampleRate
+    )
+  }
+
+  public convertFrequencyToIndex(frequency: number) {
+    return frequencyToIndex(
+      frequency,
+      this.dataArray.length,
+      this.context.sampleRate
+    )
   }
 }
