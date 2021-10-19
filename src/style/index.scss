@@ -81,10 +81,25 @@ aside {
       transform: scale3d(0, 1, 1);
     }
   }
-  p {
+  .music-name {
     margin-top: 20px;
     color: white;
     font-size: 12px;
+    font-style: italic;
+  }
+  .warning {
+    margin-top: 0px;
+    color: red;
+    font-size: 12px;
+  }
+  .footer {
+    position: absolute;
+    bottom: 0;
+    color: white;
+
+    a {
+      color: cyan;
+    }
   }
   &.hide {
     opacity: 0;
