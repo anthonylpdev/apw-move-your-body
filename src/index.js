@@ -4,6 +4,9 @@ import Stats from 'stats.js'
 
 const stats = new Stats()
 stats.showPanel(0)
+const params = new URL(document.location).searchParams
+if (!params.has('debug')) stats.dom.style.display = 'none'
+
 document.body.appendChild(stats.dom)
 
 let threeRaf = () => {}
